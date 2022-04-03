@@ -1,0 +1,2 @@
+#!/bin/sh
+find . -name "*.[ch]" -exec uncrustify -c uncrustify.cfg --no-backup {} +
