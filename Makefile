@@ -1,5 +1,4 @@
-CHECKS := c28x cm0+ e200z4 e200z7
-# e200z4-smp e200z7-smp
+CHECKS := c28x cm0+ e200z4 e200z7 e200z4-smp e200z7-smp
 SPLINTFLAGS := -I. -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
 
 all: $(CHECKS)
@@ -25,5 +24,21 @@ e200z7: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 e200z7:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
 	  $(ARCH)/timer/timer-pit.c $(ARCH)/intc/intc-mpc5777x.c
+
+e200z4-smp: ARCH := arch/ppc/e200
+e200z4-smp: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+e200z4-smp:
+	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/picoRTOS_port.c \
+	  $(ARCH)/picoRTOS-SMP_port.c $(ARCH)/core/core-mcme.c \
+	  $(ARCH)/timer/timer-pit.c $(ARCH)/intc/intc-mpc574xx.c \
+	  $(ARCH)/spinlock/spinlock-sema42.c
+
+e200z7-smp: ARCH := arch/ppc/e200
+e200z7-smp: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+e200z7-smp:
+	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/picoRTOS_port.c \
+	  $(ARCH)/picoRTOS-SMP_port.c $(ARCH)/core/core-siu.c \
+	  $(ARCH)/timer/timer-pit.c $(ARCH)/intc/intc-mpc5777x.c \
+	  $(ARCH)/spinlock/spinlock-sema42.c
 
 .phony: $(CHECKS)
