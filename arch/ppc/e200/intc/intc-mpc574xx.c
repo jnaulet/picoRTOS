@@ -15,7 +15,16 @@ void arch_intc_init(void)
     unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
 
     *INTC_BCR = 0;
-    *INTC_CPR = 0;
+    INTC_CPR[0] = 0;
+
+#if defined CONFIG_SMP_CORES
+    picoRTOS_size_t n = CONFIG_SMP_CORES;
+
+    while (n-- != 0) {
+        INTC_CPR[n] = 0;
+        INTC_IACKR[n] = (unsigned long)VTBA;
+    }
+#endif
 
     /* TICK */
     VTBA[CONFIG_ARCH_PPC_E200_TIMER_IRQ] = (unsigned long)arch_TICK;
