@@ -41,4 +41,9 @@ e200z7-smp:
 	  $(ARCH)/timer/timer-pit.c $(ARCH)/intc/intc-mpc5777x.c \
 	  $(ARCH)/spinlock/spinlock-sema42.c
 
+linux: ARCH:= arch/pthread/linux
+linux: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples +posixlib -unrecog
+linux:
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+
 .phony: $(CHECKS)
