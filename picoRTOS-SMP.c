@@ -248,7 +248,7 @@ picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
             picoRTOS.task[index].state == PICORTOS_SMP_TASK_STATE_READY)
             break;
         /* jump out on idle anyway */
-    }while(index < (CONFIG_TASK_COUNT + (picoRTOS_size_t)core));
+    } while (index < (CONFIG_TASK_COUNT + (picoRTOS_size_t)core));
 
     picoRTOS.index[core] = index;
     picoRTOS.task[index].state = PICORTOS_SMP_TASK_STATE_RUNNING;
