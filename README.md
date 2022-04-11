@@ -14,12 +14,14 @@ jitter anyway.
  - ARM Cortex M0+ (working)
  - PowerPC e200 (working)
  - PowerPC e200 SMP (working)
+ - POSIX threads / Linux simulator (working)
+ - WIN32 threads / Windows simulator (working)
 
 ## Limitations
 To increase speed and predictability, every task is identified by its exclusive
 level of priority, no round robin support is offered (yet ?).
 
-Priorities are inverted, meaning 0 is the maximum priority task.
+Priorities are reversed, meaning 0 is the maximum priority task.
 
 ## Improvements
 Some round-robin-ish support might be implemented with no impact on performance
@@ -89,8 +91,3 @@ To port to a new architecture, you just have to implement the ARCH interface you
 will find in picoRTOS.h and/or picoRTOS-SMP.h.
 
 Take a look at the arch subdirectory to get an idea.
-
-## Future plans
-
-I plan on adding a demo directory containing complete pieces of software and
-makefiles for different evaluation boards to show a real use case scenario.
