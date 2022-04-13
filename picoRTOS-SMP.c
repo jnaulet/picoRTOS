@@ -217,6 +217,11 @@ void picoRTOS_kill(void)
     arch_yield();
 }
 
+picoRTOS_priority_t picoRTOS_self(void)
+{
+    return picoRTOS.index[arch_core()];
+}
+
 picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
 {
     picoRTOS_size_t previous_index;

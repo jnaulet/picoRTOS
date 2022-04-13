@@ -152,6 +152,11 @@ void picoRTOS_kill(void)
     arch_yield();
 }
 
+picoRTOS_priority_t picoRTOS_self(void)
+{
+    return picoRTOS.index;
+}
+
 picoRTOS_stack_t *picoRTOS_switch_context(picoRTOS_stack_t *sp)
 {
     arch_assert(picoRTOS.index < (picoRTOS_size_t)CONFIG_TASK_COUNT);
