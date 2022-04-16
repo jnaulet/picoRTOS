@@ -79,10 +79,12 @@ static void set_led(unsigned long led, bool status, picoRTOS_tick_t delay)
     picoRTOS_sleep(delay);
 }
 
-static void deepcall(unsigned long n)
+static void deepcall_schedule(unsigned long n)
 {
     if (n != 0)
-        deepcall(n - 1);
+        deepcall_schedule(n - 1);
+    else
+        picoRTOS_schedule();
 }
 
 static void tick_main(void *priv)
@@ -95,7 +97,7 @@ static void tick_main(void *priv)
         set_gpio(TICK, x);
 
         x = !x;
-        picoRTOS_schedule();
+        deepcall_schedule(20);
     }
 }
 
@@ -121,7 +123,7 @@ static void led0_main(void *priv)
         set_led(LED0_0, true, LED_DELAY_LONG);
 
         /* stack test */
-        deepcall(10);
+        deepcall_schedule(10);
     }
 }
 
@@ -147,7 +149,7 @@ static void led1_main(void *priv)
         set_led(LED0_1, true, LED_DELAY_LONG);
 
         /* stack test */
-        deepcall(20);
+        deepcall_schedule(20);
     }
 }
 

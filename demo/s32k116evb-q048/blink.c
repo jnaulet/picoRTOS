@@ -36,10 +36,12 @@ static void hw_init(void)
     PTE->PDDR |= PTE_LED_BLUE;
 }
 
-static void deepcall(unsigned long n)
+static void deepcall_schedule(unsigned long n)
 {
     if (n != 0)
-        deepcall(n - 1);
+        deepcall_schedule(n - 1);
+    else
+        picoRTOS_schedule();
 }
 
 static void tick_main(void *priv)
@@ -51,9 +53,7 @@ static void tick_main(void *priv)
         PTD->PTOR = (uint32_t)PTD_TICK;
 
         /* stack test */
-        deepcall(20);
-
-        picoRTOS_schedule();
+        deepcall_schedule(20);
     }
 }
 
@@ -78,7 +78,7 @@ static void blink_main(void *priv)
         PTE->PCOR = (uint32_t)PTE_LED_BLUE;
 
         /* stack test */
-        deepcall(10);
+        deepcall_schedule(10);
     }
 }
 
