@@ -7,6 +7,8 @@
 	/* arch-specific */
 	.global arch_TICK
 	.global arch_start_first_task
+	.global arch_test_and_set
+	.global arch_compare_and_swap
 	.extern arch_timer_isr
 
 	/* special purpose registers */
@@ -32,7 +34,6 @@
 	.endm
 
 	.macro RESTORE_CONTEXT
-	stwcx. r1, 0, r1      /* clear any outstanding reservation */
 	e_lmvsrrw 0x0 (r1)    /* restore SRR[0-1] */
 	e_lmvsprw 0x8 (r1)    /* restore CR, LR, CTR, XER */
 	e_lmvgprw 0x18 (r1)   /* restore r[0, 3-12] */
@@ -67,6 +68,38 @@ arch_start_first_task:
 	RESTORE_CONTEXT
 	se_rfi
 
+	/* ARCH_TEST_AND_SET */
+	.align 4
+	.type arch_test_and_set, %function
+arch_test_and_set:
+	mbar
+	lbarx r7, 0, r3
+	se_cmpi r7, 0
+	se_bne arch_test_and_set_return
+	e_li r7, 1
+	stbcx. r7, 0, r3
+	se_bne arch_test_and_set_return
+	mbar
+	e_li r7, 0	/* success */
+arch_test_and_set_return:
+	se_mr r3, r7
+	se_blr
+	
+	/* ARCH_COMPARE_AND_SWAP */
+	.align 4
+	.type arch_compare_and_swap, %function
+arch_compare_and_swap:
+	mbar
+	lharx r7, 0, r3
+	se_cmp r7, r4
+	se_bne arch_compare_and_swap_return
+	sthcx. r5, 0, r3
+	se_bne arch_compare_and_swap_return
+	mbar
+	se_mr r3, r4	/* success */
+arch_compare_and_swap_return:
+	se_blr
+	
 	/* ARCH_MSR */
 	.align 4
 	.type arch_MSR, %function
@@ -112,6 +145,7 @@ arch_EE: /* EXTERNAL EXCEPTION */
 	mtsprg 0, r1 /* save kernel stack pointer to SPRG0 */
 	mfsprg r1, 1 /* load task stack pointer from SPRG1 */
 	RESTORE_CONTEXT
+	sync
 	se_rfi
 
 	/* SYSCALL */
@@ -124,4 +158,5 @@ arch_SC:
 	mtsprg 0, r1 /* save kernel stack pointer to SPRG0 */
 	se_mr r1, r3 /* switch to newly select task stack */
 	RESTORE_CONTEXT
+	sync
 	se_rfi

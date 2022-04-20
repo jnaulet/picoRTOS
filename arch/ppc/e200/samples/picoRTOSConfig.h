@@ -21,4 +21,7 @@
 /* SMP */
 #define CONFIG_ARCH_PPC_E200_SMP_LOCK 0xfc03c000
 
+/* MUTEX */
+#define CONFIG_DEADLOCK_COUNT 1000
+
 #endif

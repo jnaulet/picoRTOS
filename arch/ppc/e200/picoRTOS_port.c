@@ -1,9 +1,14 @@
 #include "picoRTOS.h"
 #include "picoRTOS_port.h"
 
-/* EXCEPTIONS */
+/* ASM */
 /*@external@*/ extern void arch_EE(void);
 /*@external@*/ extern void arch_SC(void);
+/*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
+/*@external@*/ extern picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr);
+/*@external@*/ extern picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
+                                                              picoRTOS_atomic_t old,
+                                                              picoRTOS_atomic_t val);
 
 #define E_B 0x78000000ul /* e_b mnemonic */
 
@@ -12,7 +17,7 @@
 void arch_init(void)
 {
     /* disable interrupts */
-    __asm__ volatile ("wrteei 0");
+    ASM("wrteei 0");
 
     /* INTERRUPTS */
     unsigned long *IVPR = arch_IVPR();
@@ -32,21 +37,19 @@ void arch_init(void)
 void arch_suspend(void)
 {
     /* disable tick */
-    __asm__ volatile ("wrteei 0");
+    ASM("wrteei 0");
 }
 
 void arch_resume(void)
 {
     /* enable tick */
-    __asm__ volatile ("wrteei 1");
+    ASM("wrteei 1");
 }
 
 picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
 {
     /* decrementing stack */
-    picoRTOS_stack_t *sp = task->stack + (task->stack_count - 1);
-
-    arch_assert(task != NULL);
+    picoRTOS_stack_t *sp = task->stack + task->stack_count;
 
     /* Allocate stack */
     sp -= ARCH_INITIAL_STACK_COUNT;
@@ -68,7 +71,7 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
 
 void arch_yield(void)
 {
-    __asm__ volatile ("se_sc");
+    ASM("se_sc");
 }
 
 void arch_idle(void *null)
@@ -76,5 +79,5 @@ void arch_idle(void *null)
     arch_assert(null == NULL);
 
     for (;;)
-        __asm__ volatile ("wait");
+        ASM("wait");
 }
