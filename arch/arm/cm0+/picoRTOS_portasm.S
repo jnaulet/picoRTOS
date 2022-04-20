@@ -27,7 +27,7 @@
 	mov r9, r5
 	mov r10, r6
 	mov r11, r7
-	msr psp, \rS	/* reclaim stack space */
+	msr psp, \rS		/* reclaim stack space */
 	subs \rS, \rS, #32	/* load the low registers */
 	ldmia \rS!, {r4-r7}
 	.endm
@@ -46,7 +46,6 @@ arch_start_first_task:
 	mov lr, r5	/* lr is now in r5 */
 	pop {r3}	/* return address is now in r3 */
 	pop {r2}	/* pop and discard XPSR */
-	pop {r2}	/* pop and discard context state */
 	cpsie i		/* enable interrupts */
 	bx r3		/* finally, jump to the user defined task code */
 

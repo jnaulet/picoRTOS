@@ -5,16 +5,16 @@ typedef unsigned long picoRTOS_stack_t;
 typedef unsigned long picoRTOS_tick_t;
 typedef unsigned long picoRTOS_size_t;
 typedef unsigned long picoRTOS_priority_t;
+typedef unsigned long picoRTOS_atomic_t;
 
-#define ARCH_INITIAL_STACK_COUNT 32
-/* See ARM v6 manual, section B1.5.6 for more details about this + 1 */
-#define ARCH_MIN_STACK_COUNT (ARCH_INITIAL_STACK_COUNT + 1)
+#define ARCH_INITIAL_STACK_COUNT 16
+#define ARCH_MIN_STACK_COUNT (ARCH_INITIAL_STACK_COUNT + 2)
 
 /* splint doesn't like inline assembly */
 #ifdef S_SPLINT_S
 # define ASM(x) {}
 #else
-# define ASM(x) __asm__ (x)
+# define ASM(x) __asm__ volatile (x)
 #endif
 
 #define arch_assert(x) if (!(x)) ASM("bkpt")
