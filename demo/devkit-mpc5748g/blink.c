@@ -1,4 +1,5 @@
 #include "picoRTOS.h"
+#include "ipc/picoRTOS_mutex.h"
 #include <stdbool.h>
 
 #include "device_registers.h"
@@ -104,7 +105,10 @@ static void leds_main(void *priv)
 {
     arch_assert(priv == NULL);
 
+    struct picoRTOS_mutex mutex;
     picoRTOS_tick_t ref = picoRTOS_get_tick();
+
+    picoRTOS_mutex_init(&mutex);
 
     for (;;) {
         picoRTOS_sleep_until(&ref, PICORTOS_DELAY_SEC(1));
@@ -128,6 +132,13 @@ static void leds_main(void *priv)
         set_led(LED2, true, LED_DELAY_LONG);
         set_led(LED1, true, LED_DELAY_LONG);
         set_led(LED0, true, LED_DELAY_LONG);
+
+        /* mutex test */
+        arch_assert(picoRTOS_mutex_trylock(&mutex) == 0);
+        arch_assert(picoRTOS_mutex_trylock(&mutex) == 0);
+
+        picoRTOS_mutex_unlock(&mutex);
+        picoRTOS_mutex_unlock(&mutex);
 
         /* stack test */
         deepcall_schedule(10);

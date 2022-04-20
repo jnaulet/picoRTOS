@@ -49,6 +49,9 @@ SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/picoRTOS_portasm.S
 SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/intc/intc-mpc574xx.c
 SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/timer/timer-pit.c
 
+# IPCs (mutex) test
+SRC_C_FILES += $(PICORTOS_DIR)/ipc/picoRTOS_mutex.c
+
 # demo
 SRC_C_FILES += blink.c
 
