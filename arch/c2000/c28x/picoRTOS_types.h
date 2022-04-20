@@ -6,6 +6,7 @@ typedef unsigned int picoRTOS_stack_t;
 typedef unsigned int picoRTOS_tick_t;
 typedef unsigned int picoRTOS_size_t;
 typedef unsigned int picoRTOS_priority_t;
+typedef unsigned int picoRTOS_atomic_t;
 
 #define ARCH_INTIAL_STACK_COUNT 38
 #define ARCH_MIN_STACK_COUNT (ARCH_INTIAL_STACK_COUNT + 2)

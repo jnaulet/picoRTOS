@@ -11,4 +11,7 @@
 /* STACK */
 #define CONFIG_DEFAULT_STACK_COUNT 128
 
+/* FUTEX */
+#define CONFIG_DEADLOCK_COUNT 1000
+
 #endif

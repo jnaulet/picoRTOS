@@ -17,6 +17,9 @@
 /* ASM */
 /*@external@*/ extern void arch_INT14(void);
 /*@external@*/ extern void arch_RTOSINT(void);
+/*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
+/*@external@*/ extern picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr);
+/* no support for arch_compare_and_swap on this architecture */
 
 /* SETUP */
 static void cputimer2_setup(void)
@@ -78,8 +81,6 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
 {
     picoRTOS_size_t i = 0;
     picoRTOS_stack_t *sp = task->stack;
-
-    arch_assert(task != NULL);
 
     /* End return call stack (debug) */
     sp[i++] = 0;

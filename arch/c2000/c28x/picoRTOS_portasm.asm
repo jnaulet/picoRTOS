@@ -4,6 +4,7 @@
 	.def _arch_INT14
 	.def _arch_RTOSINT
 	.def _arch_start_first_task
+	.def _arch_test_and_set
 	
 SAVE_CONTEXT .macro
 	;;  isr relevant registers are auto-saved
@@ -81,4 +82,12 @@ _arch_start_first_task:
 	push XAR0
 	;; enable interrupts
 	clrc INTM
+	lretr
+
+_arch_test_and_set:
+	mov AL, #1
+	tset *AR4, #0
+	sb arch_test_and_set_return, TC
+	mov AL, #0
+arch_test_and_set_return:
 	lretr
