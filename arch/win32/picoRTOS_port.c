@@ -83,3 +83,35 @@ void arch_idle(void *null)
     for (;;)
         Sleep(1000);
 }
+
+/* ATOMIC OPS emulation */
+
+picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
+{
+    picoRTOS_atomic_t ret = (picoRTOS_atomic_t)1;
+
+    arch_suspend();
+
+    if (*ptr == 0) {
+        *ptr = (picoRTOS_atomic_t)1;
+        ret = 0;
+    }
+
+    arch_resume();
+    return ret;
+}
+
+picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
+                                        picoRTOS_atomic_t old,
+                                        picoRTOS_atomic_t val)
+{
+    arch_suspend();
+
+    if (*var == old) {
+        *var = val;
+        val = old;
+    }
+
+    arch_resume();
+    return val;
+}
