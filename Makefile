@@ -1,4 +1,4 @@
-CHECKS := c28x cm0+ e200z4 e200z7 e200z4-smp e200z7-smp
+CHECKS := c28x cm0+ e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6
 SPLINTFLAGS := -I. -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
 
 all: $(CHECKS)
@@ -44,6 +44,16 @@ e200z7-smp:
 	  $(ARCH)/timer/timer-pit.c $(ARCH)/intc/intc-mpc5777x.c \
 	  $(ARCH)/spinlock/spinlock-sema42.c \
 	  ipc/picoRTOS_spinlock.c
+
+avr5: ARCH := arch/avr/avr5
+avr5: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+avr5:
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+
+avr6: ARCH := arch/avr/avr6
+avr6: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+avr6:
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
 
 linux: ARCH:= arch/pthread/linux
 linux: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples +posixlib -unrecog
