@@ -27,13 +27,4 @@ typedef unsigned long picoRTOS_core_t;
 
 #define arch_assert(x) if (!(x)) ASM("se_illegal \n\t se_nop")
 
-/* additional keywords required for this implementation */
-#if (!defined CONFIG_ARCH_PPC_E200_INTC ||              \
-     !defined CONFIG_ARCH_PPC_E200_INTC_IACKR ||        \
-     !defined CONFIG_ARCH_PPC_E200_INTC_EOIR ||         \
-     !defined CONFIG_ARCH_PPC_E200_TIMER ||               \
-     !defined CONFIG_ARCH_PPC_E200_TIMER_IRQ)
-# error Configuration is missing or incomplete !
-#endif
-
 #endif

@@ -1,28 +1,22 @@
-	#include "picoRTOSConfig.h"
-
 	/* picoRTOS */
 	.extern picoRTS_switch_context
 	.extern picoRTOS_tick
 
 	/* arch-specific */
-	.global arch_TICK
+	.extern arch_TICK
 	.global arch_start_first_task
 	.global arch_test_and_set
 	.global arch_compare_and_swap
-	.extern arch_timer_isr
 
 	/* special purpose registers */
 	.global arch_MSR
 	.global arch_IVPR
 	.global arch_core
+	.global arch_memory_barrier
 
 	/* exceptions */
 	.global arch_EE
 	.global arch_SC
-
-	/* required const */
-	.equ INTC_IACKR, CONFIG_ARCH_PPC_E200_INTC_IACKR
-	.equ INTC_EOIR, CONFIG_ARCH_PPC_E200_INTC_EOIR
 
 	/* macros */
 	.macro SAVE_CONTEXT
@@ -46,18 +40,6 @@
 	se_slwi r2, 2
 	add \reg, r2, \reg
 	.endm
-
-	/* TICK ISR */
-	.align 4
-	.type arch_TICK, %function
-arch_TICK:
-	mflr r31            /* save lr in r31 */
-	mfsprg r3, 1        /* load task stack pointer from SPRG1 */
-	e_bl picoRTOS_tick
-	mtsprg 1, r3        /* store returned task stack pointer */
-	e_bl arch_timer_isr /* reset timer */
-	mtlr r31            /* restore lr */
-	se_blr
 
 	/* ARCH_START_FIRST_TASK */
 	.align 4
@@ -119,6 +101,13 @@ arch_IVPR:
 	.type arch_core, %function
 arch_core:
 	mfpir r3
+	se_blr
+
+	/* MEMORY BARRIER */
+	.align 4
+	.type arch_memory_barrier, %function
+arch_memory_barrier:
+	mbar
 	se_blr
 
 	.align 4

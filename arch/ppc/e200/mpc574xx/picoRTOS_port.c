@@ -1,18 +1,40 @@
 #include "picoRTOS.h"
 #include "picoRTOS_port.h"
 
+#define E_B 0x78000000ul /* e_b mnemonic */
+
 /* ASM */
 /*@external@*/ extern void arch_EE(void);
 /*@external@*/ extern void arch_SC(void);
+/*@external@*/ extern void arch_TICK(void);
+/*@external@*/ extern unsigned long arch_MSR(void);
+/*@external@*/ /*@temp@*/ extern unsigned long *arch_IVPR(void);
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
 /*@external@*/ extern picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr);
 /*@external@*/ extern picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
                                                               picoRTOS_atomic_t old,
                                                               picoRTOS_atomic_t val);
-
-#define E_B 0x78000000ul /* e_b mnemonic */
-
 /* FUNCTIONS TO IMPLEMENT */
+
+static void timer_init(void)
+{
+    *PIT_MCR &= ~0x2;       /* enable PIT */
+    *PIT_LDVAL3 = (unsigned long)(CONFIG_SYSCLK_HZ / CONFIG_TICK_HZ) - 1ul;
+    *PIT_TCTRL3 |= 0x3;     /* enable interrupt & start */
+}
+
+static void intc_init(void)
+{
+    unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
+
+    *INTC_BCR = 0;
+    *INTC_CPR = 0;
+
+    /* TICK */
+    VTBA[PIT_IRQ] = (unsigned long)arch_TICK;
+    /* priority 1 on any core */
+    INTC_PSR[PIT_IRQ] = (unsigned short)0xf001;
+}
 
 void arch_init(void)
 {
@@ -28,10 +50,10 @@ void arch_init(void)
     IVPR[0x20] = E_B | ((unsigned long)arch_SC - (unsigned long)&IVPR[0x20]);
 
     /* TIMER */
-    arch_timer_init();
+    timer_init();
 
     /* INTERRUPT CONTROLLER */
-    arch_intc_init();
+    intc_init();
 }
 
 void arch_suspend(void)
