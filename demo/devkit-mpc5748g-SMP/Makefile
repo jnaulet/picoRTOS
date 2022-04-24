@@ -21,7 +21,7 @@ DEFINE += -DCPU_MPC5748G -DTURN_ON_CPU0
 INCLUDE += -I$(SYSROOT)/EWL_C/include -I$(SYSROOT)/EWL_C/include/pa
 INCLUDE += -I$(DEVICES_DIR) -I$(DEVICES_DIR)/common
 INCLUDE += -I$(DEVICES_DIR) -I.
-INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/ppc/e200
+INCLUDE += -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/ppc/e200/mpc574xx
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O0 -g3 $(DEFINE)
 CFLAGS += -fmessage-length=0 -msdata=eabi -mlra -funsigned-bitfields
@@ -44,14 +44,10 @@ SRC_S_FILES += $(DEVICES_DIR)/MPC5748G/startup/gcc/interrupt_vectors.S
 
 # picoRTOS
 SRC_C_FILES += $(PICORTOS_DIR)/picoRTOS-SMP.c
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/picoRTOS_port.c
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/picoRTOS-SMP_port.c
-SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/picoRTOS_portasm.S
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/core/core-mcme.c
-SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/core/core_e200z4.S
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/intc/intc-mpc574xx.c
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/spinlock/spinlock-sema42.c
-SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/timer/timer-pit.c
+SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_port.c
+SRC_C_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS-SMP_port.c
+SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/picoRTOS_portasm.S
+SRC_S_FILES += $(PICORTOS_DIR)/arch/ppc/e200/mpc574xx/core_e200z4.S
 
 # demo
 SRC_C_FILES += blink.c
