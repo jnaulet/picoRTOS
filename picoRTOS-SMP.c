@@ -113,7 +113,6 @@ void picoRTOS_add_task(struct picoRTOS_task *task,
                        picoRTOS_priority_t prio)
 {
     /* check params */
-    arch_assert(task != NULL);
     arch_assert(prio < (picoRTOS_priority_t)CONFIG_TASK_COUNT);
     arch_assert(picoRTOS.task[prio].state == PICORTOS_SMP_TASK_STATE_EMPTY);
 
@@ -174,12 +173,15 @@ void picoRTOS_schedule(void)
 void picoRTOS_sleep(picoRTOS_tick_t delay)
 {
     picoRTOS_size_t index = picoRTOS.index[arch_core()];
+    struct picoRTOS_SMP_task_core *task = &picoRTOS.task[index];
+
+    arch_assert(task->state == PICORTOS_SMP_TASK_STATE_RUNNING);
 
     arch_spin_lock();
 
     if (delay > 0) {
-        picoRTOS.task[index].tick = picoRTOS.tick + delay;
-        picoRTOS.task[index].state = PICORTOS_SMP_TASK_STATE_SLEEP;
+        task->tick = picoRTOS.tick + delay;
+        task->state = PICORTOS_SMP_TASK_STATE_SLEEP;
     }
 
     arch_memory_barrier();
@@ -190,18 +192,19 @@ void picoRTOS_sleep(picoRTOS_tick_t delay)
 
 void picoRTOS_sleep_until(picoRTOS_tick_t *ref, picoRTOS_tick_t period)
 {
-    arch_assert(ref != NULL);
-    arch_assert(period > 0);
-
     picoRTOS_size_t index = picoRTOS.index[arch_core()];
+    struct picoRTOS_SMP_task_core *task = &picoRTOS.task[index];
+
+    arch_assert(period > 0);
+    arch_assert(task->state == PICORTOS_SMP_TASK_STATE_RUNNING);
 
     arch_spin_lock();
 
     /* compute next wakeup */
     *ref += period;
 
-    picoRTOS.task[index].tick = *ref;
-    picoRTOS.task[index].state = PICORTOS_SMP_TASK_STATE_SLEEP;
+    task->tick = *ref;
+    task->state = PICORTOS_SMP_TASK_STATE_SLEEP;
 
     arch_memory_barrier();
     arch_spin_unlock();
