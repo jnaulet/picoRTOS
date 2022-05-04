@@ -32,9 +32,8 @@ static void hw_init(void)
 
     /* main clock */
     *CKGR_MOR = 0x370028ul; /* 12Mhz internal */
-    while ((*PMC_SR & 0x1) != 0) {
+    while ((*PMC_SR & 0x1) != 0)
         ASM("nop");         /* Warning: can loop indefinitely */
-    }
 }
 
 static void deepcall_schedule(unsigned long n)
