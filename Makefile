@@ -1,4 +1,4 @@
-CHECKS := c28x cm0+ e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6
+CHECKS := c28x cm0+ cm3 e200z4 e200z7 e200z4-smp e200z7-smp avr5 avr6 rp2040
 SPLINTFLAGS := -I. -DCONFIG_CHECK_STACK_INTEGRITY -checks -exportlocal
 
 all: $(CHECKS)
@@ -13,6 +13,13 @@ cm0+: ARCH := arch/arm/cm0+
 cm0+: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 cm0+:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+
+cm3: ARCH := arch/arm/cm3
+cm3: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+cm3:
+	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_mutex.c ipc/picoRTOS_cond.c
 
 e200z4: ARCH := arch/ppc/e200/mpc574xx
 e200z4: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
@@ -53,6 +60,12 @@ avr6: ARCH := arch/avr/avr6
 avr6: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 avr6:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c
+
+rp2040: ARCH := arch/arm/cm0+/rp2040
+rp2040: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
+rp2040:
+	splint $(SPLINTFLAGS) picoRTOS-SMP.c $(ARCH)/../picoRTOS_port.c \
+	  $(ARCH)/picoRTOS-SMP_port.c
 
 linux: ARCH:= arch/pthread/linux
 linux: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples +posixlib -unrecog
