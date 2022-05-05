@@ -21,6 +21,8 @@
                                                               picoRTOS_atomic_t old,
                                                               picoRTOS_atomic_t val);
 
+/* see cm0+ port for more info */
+#ifdef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
 /* vector table */
 #define VTABLE_COUNT 48
 static unsigned long VTABLE[VTABLE_COUNT] __attribute__((aligned(128)));
@@ -35,6 +37,7 @@ static void move_vtable_to_ram(void)
 
     *VTOR = (unsigned long)VTABLE;
 }
+#endif
 
 /* FUNCTIONS TO IMPLEMENT */
 
@@ -44,7 +47,11 @@ void arch_init(void)
     ASM("cpsid i");
 
     /* INTERRUPTS */
+#ifdef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
     move_vtable_to_ram();
+#else
+    unsigned long *VTABLE = (unsigned long*)*VTOR;
+#endif
     VTABLE[14] = (unsigned long)arch_PENDSV;
     VTABLE[15] = (unsigned long)arch_SYSTICK;
 

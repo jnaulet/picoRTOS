@@ -18,6 +18,13 @@
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
 /* no support for atomic ops on this architecture */
 
+/*
+ * GCC doesn't align this to 128 when -DNDEBUG flag is passed
+ * for some reason, leading to some unexpected crashes so we
+ * want to avoid systematic copy, especially if VTABLE is already
+ * in RAM
+ */
+#ifdef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
 /* vector table */
 #define VTABLE_COUNT 48
 static unsigned long VTABLE[VTABLE_COUNT] __attribute__((aligned(128)));
@@ -32,6 +39,7 @@ static void move_vtable_to_ram(void)
 
     *VTOR = (unsigned long)VTABLE;
 }
+#endif
 
 /* FUNCTIONS TO IMPLEMENT */
 
@@ -41,7 +49,11 @@ void arch_init(void)
     ASM("cpsid i");
 
     /* INTERRUPTS */
+#ifdef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
     move_vtable_to_ram();
+#else
+    unsigned long *VTABLE = (unsigned long*)*VTOR;
+#endif
     VTABLE[14] = (unsigned long)arch_PENDSV;
     VTABLE[15] = (unsigned long)arch_SYSTICK;
 
