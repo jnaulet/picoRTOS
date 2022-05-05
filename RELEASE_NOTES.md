@@ -1,5 +1,20 @@
 # Release notes
 
+## picoRTOS v1.3
+### What's new ?
+
+One new SMP architecture has been added:
+ - RP2040 (Raspberry Pico)
+
+On this architecture, pwm0 acts as the periodic interrupt timer as the
+irq is shared by the 2 cores' NVICs and allows their synchronization.
+
+The minimal stack on ARM has been increased by 4 bytes as some crashes occurred
+in -Os mode on severely RAM limited targets (like NXP S32k116)
+
+Adding -DNDEBUG in CFLAGS has proven to cause issues with ARM's VTABLE alignment
+so the systematic copy of the VTABLE to RAM has been made optional
+
 ## picoRTOS v1.2
 ### What's new ?
 

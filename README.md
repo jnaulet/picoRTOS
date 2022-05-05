@@ -6,10 +6,6 @@ Very small, lightning fast, yet portable RTOS with SMP suppport
 
 picoRTOS is a teeny tiny RTOS with as little overhead as humanely possible.
 
-It is very hard real time oriented, meaning it doesn't offer support for interrupts
-(except for PIT and context switching) and you shouldn't use any other, as they introduce
-jitter anyway.
-
 ## Supported architectures
 
 ### Single core
@@ -24,6 +20,7 @@ jitter anyway.
 ### Multi-core SMP
 
  - PowerPC e200 SMP
+ - RP2040 SMP (Raspberry Pico)
 
 ### Simulation
 
@@ -32,10 +29,13 @@ jitter anyway.
 
 ## Working principle
 
+On every new schedule (tick) task 0 is executed first.
+Any call to a sleeping function (picoRTOS_schedule, picoRTOS_sleep or
+picoRTOS_sleep_until) will allow the scheduler to move to the next task until
+it reaches idle or a new tick occurs and the cycle starts over.
+
 To increase speed and predictability, every task is identified by its exclusive
 level of priority, no round robin support is offered.
-
-Priorities are reversed, meaning 0 is the maximum priority task.
 
 No memory management is offered, everything is static, which makes the static analyzer's
 job much easier for critical applications.
