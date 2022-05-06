@@ -13,6 +13,8 @@ void picoRTOS_task_init(struct picoRTOS_task *task,
                         picoRTOS_stack_t *stack,
                         picoRTOS_size_t stack_count)
 {
+    arch_assert(stack_count >= ARCH_MIN_STACK_COUNT);
+
     task->fn = fn;
     task->stack = stack;
     task->stack_count = stack_count;
