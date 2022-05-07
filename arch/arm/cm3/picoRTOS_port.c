@@ -100,9 +100,6 @@ void arch_yield(void)
     *NVIC_ICSR = (1ul << 28);
 }
 
-#define BUILTIN_LED (1u << 27) /* PB27 */
-#define PIOB_CODR ((unsigned long*)0x400e1034)
-
 void arch_idle(void *null)
 {
     arch_assert(null == NULL);
