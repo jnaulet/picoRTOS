@@ -62,15 +62,14 @@ int main(void)
     picoRTOS_init();
 
     struct picoRTOS_task task;
-    static picoRTOS_stack_t stack0[CONFIG_DEFAULT_STACK_COUNT];
-    static picoRTOS_stack_t stack1[CONFIG_DEFAULT_STACK_COUNT];
+    static picoRTOS_stack_t stack[CONFIG_TASK_COUNT][CONFIG_DEFAULT_STACK_COUNT];
 
     /* shared task */
-    picoRTOS_task_init(&task, producer_main, NULL, stack0, CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, producer_main, NULL, stack[0], CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, TASK_TICK_PRIO);
 
     /* per core tasks */
-    picoRTOS_task_init(&task, consumer_main, NULL, stack1, CONFIG_DEFAULT_STACK_COUNT);
+    picoRTOS_task_init(&task, consumer_main, NULL, stack[1], CONFIG_DEFAULT_STACK_COUNT);
     picoRTOS_add_task(&task, TASK_LED_PRIO);
 
     picoRTOS_start();

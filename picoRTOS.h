@@ -49,8 +49,8 @@ picoRTOS_tick_t picoRTOS_get_tick(void);            /* get current tick */
 
 /* TIME */
 #define PICORTOS_DELAY_SEC(x) (picoRTOS_tick_t)((x) * CONFIG_TICK_HZ)
-#define PICORTOS_DELAY_MSEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000)
-#define PICORTOS_DELAY_USEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000000)
+#define PICORTOS_DELAY_MSEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / CONFIG_TICK_HZ)
+#define PICORTOS_DELAY_USEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / (1000 * CONFIG_TICK_HZ))
 
 /* ARCH : FUNCTIONS TO IMPLEMENT */
 
