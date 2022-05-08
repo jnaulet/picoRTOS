@@ -23,6 +23,11 @@ add_executable(blink
   ../../arch/arm/cm0+/picoRTOS_port.c
   ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_portasm.S
   ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_port.c
+  ../../arch/arm/cm0+/rp2040/picoRTOS-SMP_port.c
+  ../../arch/arm/cm0+/rp2040/picoRTOS_futex.c
+  ../../arch/arm/cm0+/rp2040/picoRTOS_spinlock.c
+  ../../arch/arm/cm0+/rp2040/picoRTOS_mutex.c
+  ../../arch/arm/cm0+/rp2040/picoRTOS_cond.c
   )
 
 # picoRTOS includes
@@ -30,6 +35,7 @@ target_include_directories(blink PRIVATE
   .
   ../..
   ../../arch/arm/cm0+/rp2040
+  ../../ipc
   )
 
 # pull in common dependencies

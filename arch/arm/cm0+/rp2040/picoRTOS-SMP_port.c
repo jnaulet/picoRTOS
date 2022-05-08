@@ -11,10 +11,6 @@
 # error Deadlock count is not defined
 #endif
 
-#ifndef SIO_BASE
-# define SIO_BASE 0xd0000000
-#endif
-
 #ifndef PWM_BASE
 # define PWM_BASE 0x40050000
 #endif
@@ -128,4 +124,5 @@ void arch_memory_barrier(void)
 {
     ASM("dmb ish");
 }
+
 
