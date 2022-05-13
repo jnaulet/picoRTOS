@@ -7,7 +7,8 @@ c28x: ARCH := arch/c2000/c28x
 c28x: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
 c28x:
 	splint $(SPLINTFLAGS) picoRTOS.c $(ARCH)/picoRTOS_port.c \
-	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c
+	  ipc/picoRTOS_spinlock.c ipc/picoRTOS_futex.c \
+	  ipc/picoRTOS_fcond.c
 
 cm0+: ARCH := arch/arm/cm0+
 cm0+: SPLINTFLAGS += -I$(ARCH) -I$(ARCH)/samples
