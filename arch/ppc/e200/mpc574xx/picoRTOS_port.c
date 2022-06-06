@@ -18,7 +18,7 @@
 #define PIT_TFLG3   ((volatile unsigned long*)(PIT_BASE + 0x13c))
 
 /* ASM */
-/*@external@*/ extern void arch_TICK(void);
+/*@external@*/ extern void arch_TICK(void *priv);
 /*@external@*/ extern unsigned long arch_MSR(void);
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
 /*@external@*/ extern picoRTOS_atomic_t arch_compare_and_swap(picoRTOS_atomic_t *var,
@@ -33,19 +33,6 @@ static void timer_init(void)
     *PIT_TCTRL3 |= 0x3;     /* enable interrupt & start */
 }
 
-static void intc_init(void)
-{
-    unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
-
-    *INTC_BCR = 0;
-    *INTC_CPR = 0;
-
-    /* TICK */
-    VTBA[PIT_IRQ] = (unsigned long)arch_TICK;
-    /* priority 1 on any core */
-    INTC_PSR[PIT_IRQ] = (unsigned short)0xf001;
-}
-
 void arch_init(void)
 {
     /* disable interrupts */
@@ -53,11 +40,15 @@ void arch_init(void)
 
     /* INTERRUPTS are statically managed in picoRTOS_common.S */
 
-    /* TIMER */
-    timer_init();
-
     /* INTERRUPT CONTROLLER */
-    intc_init();
+    *INTC_BCR = 0;
+    *INTC_CPR = 0;
+
+    /* TIMER */
+    arch_register_interrupt((picoRTOS_irq_t)PIT_IRQ, arch_TICK, NULL);
+    arch_enable_interrupt((picoRTOS_irq_t)PIT_IRQ);
+
+    timer_init();
 }
 
 void arch_suspend(void)
@@ -113,4 +104,38 @@ void arch_idle(void *null)
 picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
 {
     return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
+}
+
+/* INTERRUPTS */
+
+#define ARCH_IRQ_COUNT 768
+
+/*@external@*/
+extern unsigned long arch_EE_private[ARCH_IRQ_COUNT];
+
+void arch_register_interrupt(picoRTOS_irq_t irq, picoRTOS_isr_fn fn, void *priv)
+{
+    arch_assert(irq < (picoRTOS_irq_t)ARCH_IRQ_COUNT);
+
+    unsigned long *VTBA = (unsigned long*)(*INTC_IACKR & 0xfffff000);
+
+    /* IRQ */
+    VTBA[irq] = (unsigned long)fn;
+    arch_EE_private[irq] = (unsigned long)priv;
+}
+
+void arch_enable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_assert(irq < (picoRTOS_irq_t)ARCH_IRQ_COUNT);
+
+    /* priority 1 on any core */
+    INTC_PSR[irq] = (unsigned short)0xf001;
+}
+
+void arch_disable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_assert(irq < (picoRTOS_irq_t)ARCH_IRQ_COUNT);
+
+    /* priority 0 on any core */
+    INTC_PSR[irq] = (unsigned short)0xf000;
 }

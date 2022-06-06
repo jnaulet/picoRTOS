@@ -107,14 +107,20 @@ IVOR4_Handler:
 	mtsprg 1, r1 /* store task stack pointer to SPRG1 */
 	mfsprg r1, 0 /* load kernel stack pointer from SPRG0 */
 
-	/* put ISR address in r3 */
+	/* put ISR address in lr */
 	e_lis  r3, INTC_IACKR@ha
 	ADD_CORE_OFFSET_TO r3
 	e_lwz  r3, INTC_IACKR@l(r3)
 	se_lwz r3, 0x0(r3)
+	se_mtlr r3
+
+	/* put private field in r3 */
+	e_rlwinm r4, r3, 0, 20, 30 /* extract intvec */
+	e_lis r3, arch_EE_private@ha
+	add   r3, r4, r3
+	e_lwz r3, arch_EE_private@l(r3)
 
 	/* branch to ISR with return address */
-	se_mtlr r3
 	se_blrl
 
 	/* ack interrupt */

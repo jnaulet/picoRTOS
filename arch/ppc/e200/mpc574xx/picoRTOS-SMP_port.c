@@ -12,6 +12,7 @@
 
 #define INTC_CPR   ((volatile unsigned long*)(INTC_BASE + 0x10))
 #define INTC_IACKR ((volatile unsigned long*)(INTC_BASE + 0x20))
+#define INTC_PSR   ((volatile unsigned short*)(INTC_BASE + 0x60))
 
 #define SEMA42_GATE0 ((volatile unsigned char*)SEMA42_BASE)
 #define SEMA42_RSTGT ((volatile unsigned short*)(SEMA42_BASE + 0x40))
@@ -142,4 +143,32 @@ void arch_spin_lock(void)
 void arch_spin_unlock(void)
 {
     *SEMA42_GATE0 = (unsigned char)0;
+}
+
+extern void arch_smp_enable_interrupt(picoRTOS_irq_t irq,
+                                      picoRTOS_mask_t core_mask)
+{
+    arch_assert(irq < (picoRTOS_irq_t)ARCH_IRQ_COUNT);
+
+    unsigned short psr = INTC_PSR[irq];
+
+    psr |= (((unsigned short)0x1 & core_mask) << 15);
+    psr |= (((unsigned short)0x2 & core_mask) << 13);
+
+    /* priority 1 on any core */
+    INTC_PSR[irq] = psr | (unsigned short)0x1;
+}
+
+extern void arch_smp_disable_interrupt(picoRTOS_irq_t irq,
+                                       picoRTOS_mask_t core_mask)
+{
+    arch_assert(irq < (picoRTOS_irq_t)ARCH_IRQ_COUNT);
+
+    unsigned short psr = INTC_PSR[irq];
+
+    psr &= ~(((unsigned short)0x1 & core_mask) << 15);
+    psr &= ~(((unsigned short)0x2 & core_mask) << 13);
+
+    /* priority 0 on any core */
+    INTC_PSR[irq] = psr | (unsigned short)0x1;
 }
