@@ -1,4 +1,5 @@
 	.global arch_TICK
+	.global arch_EE_private
 
 	.equ INTC_IACKR, 0xfc040020
 	.equ INTC_EOIR, 0xfc040030
@@ -20,3 +21,8 @@ arch_TICK:
 	e_stw r7, PIT_TFLG3@l(r3)
 	mtlr r31            /* restore lr */
 	se_blr
+
+	.align 4
+arch_EE_private:
+	.space 3072
+	.size arch_EE_private, 3072

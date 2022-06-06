@@ -7,6 +7,7 @@ typedef unsigned long picoRTOS_stack_t;
 typedef unsigned long picoRTOS_tick_t;
 typedef unsigned long picoRTOS_priority_t;
 typedef unsigned short picoRTOS_atomic_t;
+typedef unsigned long picoRTOS_irq_t;
 
 #define ARCH_INITIAL_STACK_COUNT 36
 #define ARCH_MIN_STACK_COUNT (ARCH_INITIAL_STACK_COUNT + 6)
@@ -16,6 +17,9 @@ typedef unsigned long picoRTOS_mask_t;
 typedef unsigned long picoRTOS_core_t;
 
 #define ARCH_SMP_MIN_STACK_COUNT 128
+
+/* INTERRUPTS */
+#define ARCH_IRQ_COUNT 768
 
 /* splint cannot check inline assembly */
 #ifdef S_SPLINT_S
