@@ -31,5 +31,7 @@ void picoRTOS_futex_lock(picoRTOS_futex_t *futex)
 
 void picoRTOS_futex_unlock(picoRTOS_futex_t *futex)
 {
+    arch_assert(*futex != 0);
+
     *futex = (picoRTOS_futex_t)0;
 }
