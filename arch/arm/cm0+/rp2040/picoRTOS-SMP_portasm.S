@@ -1,11 +1,13 @@
 	.syntax unified
-	
+
 	/* Declarations */
 	.global arch_PWM_WRAP
 
 	#include "../picoRTOS_portasm.S"
-	
+
 	.equ PWM_INTR, 0x400500a4
+
+	.text
 
 	.align 1
 	.thumb_func

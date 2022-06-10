@@ -1,10 +1,10 @@
 	.syntax unified
-	
+
 	/* Declarations */
 	.global arch_start_first_task
 	.global arch_SYSTICK
 	.global arch_PENDSV
-	
+
 	.extern picoRTOS_tick
 	.extern picoRTOS_switch_context
 
@@ -30,7 +30,7 @@
 	ldmia \rS!, {r4-r7}	/* load low registers */
 	msr psp, \rS
 	.endm
-	
+
 	.align 1
 	.thumb_func
 	.type arch_start_first_task, %function
@@ -56,7 +56,7 @@ arch_SYSTICK:
 	bl picoRTOS_tick
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */
-	
+
 	.align 1
 	.thumb_func
 	.type arch_PENDSV, %function
@@ -66,3 +66,38 @@ arch_PENDSV:
 	bl picoRTOS_switch_context
 	RESTORE_CONTEXT r0
 	pop {pc}	/* return */
+
+	/* INTERRUPTS */
+	.global arch_NVIC_handler
+	.global ISR_TABLE
+
+	.equ NVIC_ICSR, 0xe000ed04
+
+	.align 1
+	.thumb_func
+	.type arch_NVIC_handler, %function
+arch_NVIC_handler:
+	push {lr}
+	SAVE_CONTEXT r0
+	push {r0}
+	/* get active exception in r0 */
+	ldr r2, =NVIC_ICSR
+	ldr r0, [r2]
+	lsls r0, r0, #23
+        lsrs r0, r0, #23
+	subs r0, #16
+	ldr r3, =ISR_TABLE
+	lsls r0, r0, #3	/* x8 to get the right isr table index */
+	adds r3, r3, r0
+	ldr r1, [r3]
+	ldr r0, [r3, #4]
+	blx r1
+	pop {r0}
+	RESTORE_CONTEXT r0
+	pop {pc}
+
+	.bss
+	.align 2
+ISR_TABLE:
+	.space	512
+	.size	ISR_TABLE, 512
