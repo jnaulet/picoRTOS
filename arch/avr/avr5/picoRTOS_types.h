@@ -6,9 +6,10 @@ typedef unsigned char picoRTOS_stack_t;
 typedef unsigned int picoRTOS_tick_t;
 typedef unsigned int picoRTOS_priority_t;
 typedef unsigned char picoRTOS_atomic_t;
+typedef unsigned int picoRTOS_irq_t;
 
 #define ARCH_INTIAL_STACK_COUNT 35
-#define ARCH_MIN_STACK_COUNT (ARCH_INTIAL_STACK_COUNT + 1)
+#define ARCH_MIN_STACK_COUNT (ARCH_INTIAL_STACK_COUNT + 6)
 
 /* splint cannot check inline assembly */
 #ifdef S_SPLINT_S
