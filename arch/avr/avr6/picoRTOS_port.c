@@ -2,7 +2,7 @@
 
 /* ASM */
 /*@external@*/ extern void arch_start_first_task(picoRTOS_stack_t *sp);
-/*@external@*/ extern void arch_TIMER1_COMPA(void);
+/*@external@*/ extern void arch_TIMER1_COMPA(void *priv);
 
 /* AVR is one of the rare CPUs that can switch contexts without an interrupt,
  * so this is directly defined in assembly language */
@@ -11,7 +11,9 @@
 /* interrupts (avr-specific, exclude from static analysis) */
 #ifndef S_SPLINT_S
 # include <avr/interrupt.h>
-ISR_ALIAS(TIMER1_COMPA_vect, arch_TIMER1_COMPA);
+# define TIMER1_COMPA_IRQ TIMER1_COMPA_vect_num
+#else
+# define TIMER1_COMPA_IRQ 0
 #endif
 
 /* systick registers */
@@ -52,6 +54,9 @@ void arch_init(void)
     /* disable interrupts */
     ASM("cli");
 
+    arch_register_interrupt((picoRTOS_irq_t)TIMER1_COMPA_IRQ,
+                            arch_TIMER1_COMPA, NULL);
+
     /* TIMER5 */
     timer_setup();
 }
@@ -80,11 +85,11 @@ picoRTOS_stack_t *arch_prepare_stack(struct picoRTOS_task *task)
     sp[34] = (picoRTOS_stack_t)((unsigned int)task->fn >> 8);
     sp[33] = (picoRTOS_stack_t)((unsigned long)task->fn >> 16); /* ret pc */
 
-    sp[32] = (unsigned char)0x0;                                /* r0 */
-    sp[31] = (picoRTOS_stack_t)(1u << 7);                       /* sreg (int enable) */
+    sp[30] = (unsigned char)0x0;                                /* r0 */
+    sp[29] = (picoRTOS_stack_t)(1u << 7);                       /* sreg (int enable) */
 
-    sp[7] = (picoRTOS_stack_t)(unsigned int)task->priv;         /* r24 */
-    sp[6] = (picoRTOS_stack_t)((unsigned int)task->priv >> 8);  /* r25 */
+    sp[5] = (picoRTOS_stack_t)(unsigned int)task->priv;         /* r24 */
+    sp[4] = (picoRTOS_stack_t)((unsigned int)task->priv >> 8);  /* r25 */
 
     return sp - 1;                                              /* pop pre-increments */
 }
@@ -120,3 +125,19 @@ picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
                                  (picoRTOS_atomic_t)1);
 }
 #endif
+
+/* INTERRUPTS MANAGEMENT */
+
+#define ARCH_VECTOR_COUNT 56
+
+/*@external@*/
+extern struct {
+    picoRTOS_isr_fn fn;
+    /*@temp@*/ /*@null@*/ void *priv;
+} ISR_TABLE[ARCH_VECTOR_COUNT];
+
+void arch_register_interrupt(picoRTOS_irq_t irq, picoRTOS_isr_fn fn, void *priv)
+{
+    ISR_TABLE[irq - 1].fn = fn;
+    ISR_TABLE[irq - 1].priv = priv;
+}
