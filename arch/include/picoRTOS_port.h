@@ -34,4 +34,14 @@ arch_compare_and_swap(/*@notnull@*/ picoRTOS_atomic_t *var,
                       picoRTOS_atomic_t old,
                       picoRTOS_atomic_t val);               /* atomic compare and swap */
 
+/* ARCH: INTERRUPTS (optional) */
+
+/*@external@*/ extern void
+arch_register_interrupt(picoRTOS_irq_t irq,
+                        /*@notnull@*/ picoRTOS_isr_fn fn,
+                        /*@null@*/ void *priv);
+
+/*@external@*/ extern void arch_enable_interrupt(picoRTOS_irq_t irq);
+/*@external@*/ extern void arch_disable_interrupt(picoRTOS_irq_t irq);
+
 #endif

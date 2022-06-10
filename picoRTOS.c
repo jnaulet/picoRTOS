@@ -241,3 +241,22 @@ picoRTOS_tick_t picoRTOS_get_tick(void)
 {
     return picoRTOS.tick;
 }
+
+/* INTERRUPT MANAGEMENT */
+
+void picoRTOS_register_interrupt(picoRTOS_irq_t irq,
+                                 picoRTOS_isr_fn fn,
+                                 void *priv)
+{
+    arch_register_interrupt(irq, fn, priv);
+}
+
+void picoRTOS_enable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_enable_interrupt(irq);
+}
+
+void picoRTOS_disable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_disable_interrupt(irq);
+}

@@ -43,6 +43,17 @@ picoRTOS_tick_t picoRTOS_get_tick(void);                        /* get current t
 #define PICORTOS_DELAY_MSEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000)
 #define PICORTOS_DELAY_USEC(x) (picoRTOS_tick_t)(((x) * CONFIG_TICK_HZ) / 1000000)
 
+/* INTERRUPT MANAGEMENT */
+
+typedef void (*picoRTOS_isr_fn)(/*@null@*/ void*);
+
+void picoRTOS_register_interrupt(picoRTOS_irq_t irq,
+                                 /*@notnull@*/ picoRTOS_isr_fn fn,
+                                 /*@null@*/ void *priv);
+
+void picoRTOS_enable_interrupt(picoRTOS_irq_t irq);
+void picoRTOS_disable_interrupt(picoRTOS_irq_t irq);
+
 /* assert */
 #ifndef arch_assert
 # define arch_assert(x) if (!(x)) for (;;)
