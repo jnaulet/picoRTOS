@@ -6,6 +6,7 @@
 #define SYSTICK_CVR ((volatile unsigned long*)0xe000e018)
 
 /* NVIC */
+#define NVIC_ISER         ((volatile unsigned long*)0xe000e100)
 #define NVIC_ICSR         ((volatile unsigned long*)0xe000ed04)
 #define NVIC_SHPR3        ((volatile unsigned long*)0xe000ed20)
 
@@ -23,7 +24,7 @@
 /* see cm0+ port for more info */
 #ifdef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
 /* vector table */
-#define VTABLE_COUNT 48
+#define VTABLE_COUNT 80
 static unsigned long VTABLE[VTABLE_COUNT] __attribute__((aligned(128)));
 
 static void move_vtable_to_ram(void)
@@ -112,4 +113,43 @@ void arch_idle(void *null)
 picoRTOS_atomic_t arch_test_and_set(picoRTOS_atomic_t *ptr)
 {
     return arch_compare_and_swap(ptr, 0, (picoRTOS_atomic_t)1);
+}
+
+/* INTERRUPT MANAGEMENT */
+
+#define NVIC_INTERRUPT_COUNT 64
+
+/*@external@*/
+extern struct {
+    picoRTOS_isr_fn fn;
+    /*@temp@*/ /*@null@*/ void *priv;
+} ISR_TABLE[NVIC_INTERRUPT_COUNT];
+
+/*@external@*/ extern void arch_NVIC_handler(void);
+
+void arch_register_interrupt(picoRTOS_irq_t irq, picoRTOS_isr_fn fn, void *priv)
+{
+    arch_assert(irq < (picoRTOS_irq_t)NVIC_INTERRUPT_COUNT);
+
+#ifndef CONFIG_ARCH_ARM_MOVE_VTABLE_TO_RAM
+    unsigned long *VTABLE = (unsigned long*)*VTOR;
+#endif
+
+    VTABLE[16 + irq] = (unsigned long)arch_NVIC_handler;
+    ISR_TABLE[irq].fn = fn;
+    ISR_TABLE[irq].priv = priv;
+}
+
+void arch_enable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_assert(irq < (picoRTOS_irq_t)NVIC_INTERRUPT_COUNT);
+
+    NVIC_ISER[irq >> 5] |= (1ul << irq);
+}
+
+void arch_disable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_assert(irq < (picoRTOS_irq_t)NVIC_INTERRUPT_COUNT);
+
+    NVIC_ISER[irq >> 5] &= ~(1ul << irq);
 }
