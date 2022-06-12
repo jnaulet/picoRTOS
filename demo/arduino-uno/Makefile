@@ -12,8 +12,11 @@ BUILD_DIR := build
 SKETCH_DIR := sketch/$(SKETCH)
 
 DEFINE := -D__AVR_ATmega328P__
-INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/arch/include
-INCLUDE += -I$(PICORTOS_DIR)/$(ARCH)
+INCLUDE := -I. -I$(PICORTOS_DIR) -I$(PICORTOS_DIR)/$(ARCH)
+INCLUDE += -I$(PICORTOS_DIR)/drivers/hal
+INCLUDE += -I$(PICORTOS_DIR)/drivers/clock
+INCLUDE += -I$(PICORTOS_DIR)/drivers/gpio
+INCLUDE += -I$(PICORTOS_DIR)/drivers/uart
 
 CFLAGS += -Wall -Wextra -std=c99 $(INCLUDE) -O1 -g3 $(DEFINE) -mmcu=avr5
 SFLAGS += $(DEFINE) $(INCLUDE) -g3 -mmcu=avr5
@@ -28,6 +31,18 @@ SRC_H_FILES += $(PICORTOS_DIR)/picoRTOS.h
 SRC_H_FILES += $(PICORTOS_DIR)/arch/include/picoRTOS_port.h
 SRC_H_FILES += $(PICORTOS_DIR)/$(ARCH)/picoRTOS_types.h
 SRC_H_FILES += picoRTOSConfig.h
+
+# drivers
+SRC_C_FILES += $(PICORTOS_DIR)/drivers/clock/clock-atmega328p.c
+SRC_C_FILES += $(PICORTOS_DIR)/drivers/gpio/gpio-avr.c
+SRC_C_FILES += $(PICORTOS_DIR)/drivers/uart/uartcore.c
+SRC_C_FILES += $(PICORTOS_DIR)/drivers/uart/uart-avr.c
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/hal/clock.h
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/clock/clock-atmega328p.h
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/hal/gpio.h
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/gpio/gpio-avr.h
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/hal/uart.h
+SRC_H_FILES += $(PICORTOS_DIR)/drivers/uart/uart-avr.h
 
 # demo
 SRC_C_FILES += blink.c
