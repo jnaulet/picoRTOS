@@ -329,3 +329,40 @@ picoRTOS_tick_t picoRTOS_get_tick(void)
 {
     return picoRTOS.tick;
 }
+
+/* INTERRUPT MANAGEMENT */
+
+void picoRTOS_register_interrupt(picoRTOS_irq_t irq,
+                                 picoRTOS_isr_fn fn,
+                                 void *priv)
+{
+    arch_register_interrupt(irq, fn, priv);
+}
+
+void picoRTOS_enable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_enable_interrupt(irq);
+}
+
+void picoRTOS_disable_interrupt(picoRTOS_irq_t irq)
+{
+    arch_disable_interrupt(irq);
+}
+
+void picoRTOS_SMP_enable_interrupt(picoRTOS_irq_t irq,
+                                   picoRTOS_mask_t core_mask)
+{
+    arch_assert(core_mask != 0);
+    arch_assert(core_mask < (picoRTOS_mask_t)(1 << CONFIG_SMP_CORES));
+
+    arch_smp_enable_interrupt(irq, core_mask);
+}
+
+void picoRTOS_SMP_disable_interrupt(picoRTOS_irq_t irq,
+                                    picoRTOS_mask_t core_mask)
+{
+    arch_assert(core_mask != 0);
+    arch_assert(core_mask < (picoRTOS_mask_t)(1 << CONFIG_SMP_CORES));
+
+    arch_smp_disable_interrupt(irq, core_mask);
+}

@@ -21,4 +21,11 @@
 void picoRTOS_SMP_set_core_mask(picoRTOS_priority_t prio,
                                 picoRTOS_mask_t core_mask);
 
+/* INTERRUPT MANAGEMENT */
+
+void picoRTOS_SMP_enable_interrupt(picoRTOS_irq_t irq,
+                                   picoRTOS_mask_t core_mask);
+void picoRTOS_SMP_disable_interrupt(picoRTOS_irq_t irq,
+                                    picoRTOS_mask_t core_mask);
+
 #endif

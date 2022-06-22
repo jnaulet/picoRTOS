@@ -18,4 +18,13 @@ extern void arch_spin_lock(void);                                   /* protects 
 extern void arch_spin_unlock(void);                                 /* ends code section protection */
 extern void arch_memory_barrier(void);                              /* memory barrier (sync) */
 
+/* INTERRUPT MANAGEMENT (optional) */
+
+/*@external@*/
+extern void arch_smp_enable_interrupt(picoRTOS_irq_t irq,
+                                      picoRTOS_mask_t core_mask);
+/*@external@*/
+extern void arch_smp_disable_interrupt(picoRTOS_irq_t irq,
+                                       picoRTOS_mask_t core_mask);
+
 #endif
