@@ -1,5 +1,25 @@
 # Release notes
 
+## picoRTOS v1.5
+### What's new ?
+
+This version introduces support for contextual interrupt management. A new API is
+available :
+ - void picoRTOS_register_interrupt(picoRTOS_irq_t irq, picoRTOS_isr_fn fn, void *priv);
+ - void picoRTOS_enable_interrupt(picoRTOS_irq_t irq);
+ - void picoRTOS_disable_interrupt(picoRTOS_irq_t irq);
+
+The following architectures are supported:
+ - PPC e200
+ - AVR5
+ - AVR6
+ - ARM Cortex-M0+
+ - ARM Cortex-M3
+ - ARM Cortex-M4F
+
+This is still experimental, it is quite hard to test as usually on a hard RTOS you only
+need 1 or 2 interrupts (tick and context switch)
+
 ## picoRTOS v1.4.4
 ### What's new ?
 

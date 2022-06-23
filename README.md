@@ -55,6 +55,15 @@ not recommended, though.
  - re-entrant mutexes (require arch_compare_and_swap)
  - conditions (require mutexes)
 
+## Interrupt management
+
+Version 1.5 introduces contextual interrupt management as an experimental feature.
+
+ARMs, PPCs and AVRs are supported at least partially at the moment, but not c2000.
+
+This feature should be used with care, as interrupts tend to destroy the real-time part in
+"RTOS" (fair warning).
+
 ## How to use
 
 Copy the picoRTOS directory in your project and add picoRTOS.c to your build.
